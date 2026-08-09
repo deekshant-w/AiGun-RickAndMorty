@@ -4,15 +4,13 @@ from pathlib import Path
 import cv2
 from PIL import Image
 
-from src.rnm.dataSpecs import FilePathInput
+from rnm.dataSpecs import FilePathInput
+from rnm.paths import DYNAMIC_IMAGE_PATH, STATIC_IMAGE_PATH, TMP_DIR
 
 logger = logging.getLogger(__name__)
 
 # Input Sectioin
 
-PROJECT_ROOT = Path(__file__).parent.parent
-STATIC_IMAGE_PATH = PROJECT_ROOT / ".tmp" / "alien.png"
-DYNAMIC_IMAGE_PATH = PROJECT_ROOT / ".tmp" / "tmp.png"
 USE_REAL_CAMERA = True
 
 
@@ -32,6 +30,7 @@ def dynamic_camera() -> str:
     if not ret:
         raise RuntimeError("Failed to capture image from camera.")
     cam.release()
+    TMP_DIR.mkdir(exist_ok=True)
     cv2.imwrite(str(DYNAMIC_IMAGE_PATH), frame)
     return str(DYNAMIC_IMAGE_PATH)
 

@@ -3,7 +3,7 @@ import logging
 
 from langchain.agents import create_agent
 
-from src.rnm.tools import visual_io
+from rnm.tools import visual_io
 
 logging.basicConfig(level=logging.INFO)
 
@@ -20,6 +20,8 @@ def process_args(args):
 
 
 def main():
+    process_args(parser.parse_args())
+
     logging.info("Starting AI Gun - Rick and Morty Edition")
     SYSTEM_PROMPT = "You are a helpful AI agent that plans before acting and uses tools to interact with the world."
     agent = create_agent(
@@ -42,6 +44,4 @@ def main():
 
 
 if __name__ == "__main__":
-    args = parser.parse_args()
-    process_args(args)
     main()
