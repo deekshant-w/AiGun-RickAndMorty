@@ -14,49 +14,26 @@ clip_processor = CLIPProcessor.from_pretrained(CLIP_MODEL_ID)
 
 DINO_MODEL_ID = "IDEA-Research/grounding-dino-tiny"
 dino_processor = AutoProcessor.from_pretrained(DINO_MODEL_ID)
-dino_model = AutoModelForZeroShotObjectDetection.from_pretrained(DINO_MODEL_ID, device_map="auto")
+dino_model = AutoModelForZeroShotObjectDetection.from_pretrained(DINO_MODEL_ID).to(device)
+
+LABELS = [
+    "a photograph of a real human face",
+    "a cartoon or alien face, animated, illustrated",
+    "not a face",
+]
 
 
-def classify_face(image_input: str | Image.Image) -> dict:
-    labels = [
-        "a photograph of a real human face",
-        "a cartoon or alien face, animated, illustrated",
-        "not a face",
-    ]
-    if isinstance(image_input, Image.Image):
-        image = image_input.convert("RGB")
-    else:
-        image = Image.open(image_input).convert("RGB")
-
-    inputs = clip_processor(text=labels, images=image, return_tensors="pt", padding=True).to(device)
+def classify_faces(images: list[Image.Image], labels: list[str]) -> dict:
+    inputs = clip_processor(text=labels, images=images, return_tensors="pt", padding=True).to(device)
     with torch.no_grad():
         outputs = clip_model(**inputs)
-    probs = outputs.logits_per_image.softmax(dim=-1).squeeze(0)
-    idx = int(probs.argmax())
-    return {"label": labels[idx], "confidence": float(probs[idx])}
+    probs = outputs.logits_per_image.softmax(dim=-1)
+    idx = probs.argmax(dim=-1)
+    return {"label": [labels[i] for i in idx], "confidence": [float(probs[i, j]) for i, j in enumerate(idx)]}
 
 
-def classify_faces(image_input: str | Image.Image) -> dict:
-    labels = [
-        "a photograph of a real human face",
-        "a cartoon or alien face, animated, illustrated",
-        "not a face",
-    ]
-    if isinstance(image_input, Image.Image):
-        image = image_input.convert("RGB")
-    else:
-        image = Image.open(image_input).convert("RGB")
-
-    inputs = clip_processor(text=labels, images=image, return_tensors="pt", padding=True).to(device)
-    with torch.no_grad():
-        outputs = clip_model(**inputs)
-    probs = outputs.logits_per_image.softmax(dim=-1).squeeze(0)
-    idx = int(probs.argmax())
-    return {"label": labels[idx], "confidence": float(probs[idx])}
-
-
-def is_alien_face(face_dict: dict) -> bool:
-    normalized = face_dict["label"].lower()
+def is_alien_face(label: str) -> bool:
+    normalized = label.lower()
     return "alien" in normalized or "cartoon" in normalized
 
 
@@ -88,7 +65,6 @@ def draw_cross(
 
 
 def main():
-
     image = Image.open(STATIC_IMAGE_PATH).convert("RGB")
     inputs = dino_processor(images=image, text=[["face"]], return_tensors="pt").to(dino_model.device)
     with torch.no_grad():
@@ -104,22 +80,24 @@ def main():
     result = results[0]
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("arialbd.ttf", 24)
+    faces = classify_faces(
+        [image.crop((int(box[0]), int(box[1]), int(box[2]), int(box[3]))) for box in result["boxes"]], LABELS
+    )
 
     def draw_text(position, text, color):
         draw.text((position[0], position[1] - 10), text, fill=color, font=font, anchor="ms")
 
-    for box, _score, _label_text in zip(result["boxes"], result["scores"], result["text_labels"], strict=True):
+    for box, _score, _label_text, label, confidence in zip(
+        result["boxes"], result["scores"], result["text_labels"], faces["label"], faces["confidence"], strict=True
+    ):
         box = [round(x, 2) for x in box.tolist()]
-        crop = image.crop((box[0], box[1], box[2], box[3]))
-        face_dict = classify_face(crop)
-
-        if is_alien_face(face_dict):
+        if is_alien_face(label):
             draw.rectangle(box, outline="red", width=3)
-            draw_text(((box[0] + box[2]) / 2, box[1]), f"alien:({face_dict['confidence']:.2f})", color="red")
+            draw_text(((box[0] + box[2]) / 2, box[1]), f"alien:({confidence:.2f})", color="red")
             forehead_point = determine_forehead_point(box)
             draw_cross(draw, forehead_point)
         else:
             draw.rectangle(box, outline="green", width=3)
-            draw_text(((box[0] + box[2]) / 2, box[1]), f"human:({face_dict['confidence']:.2f})", color="green")
+            draw_text(((box[0] + box[2]) / 2, box[1]), f"human:({confidence:.2f})", color="green")
 
     image.show()
