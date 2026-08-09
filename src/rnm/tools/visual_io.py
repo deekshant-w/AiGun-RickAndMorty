@@ -47,7 +47,7 @@ def camera() -> FilePathInput:
         logger.info("Using static camera feed.")
         image_path = static_camera()
 
-    return FilePathInput(path=image_path)
+    return FilePathInput(path=Path(image_path))
 
 
 # Output Section
