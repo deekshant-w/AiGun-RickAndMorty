@@ -14,3 +14,20 @@ dependencies = [
 
 [tool.uv]
 environments = ["sys_platform == 'win32'"]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.3",
+    "poethepoet>=0.48",
+    "pre-commit>=4.0",
+    "pytest>=9.1",
+    "pytest-cov>=7.1",
+    "ruff>=0.16",
+]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"] # line length is the formatter's job
