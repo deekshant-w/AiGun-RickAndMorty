@@ -53,7 +53,7 @@ def determine_forehead_point(box: Sequence[float]) -> tuple[int, int]:
 
 
 def draw_cross(
-    draw: ImageDraw.Draw,
+    draw: ImageDraw.ImageDraw,
     point: tuple[int, int],
     size: int = 10,
     color: str = "cyan",
