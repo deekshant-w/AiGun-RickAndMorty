@@ -2,7 +2,6 @@ import logging
 from pathlib import Path
 
 import cv2
-from langchain_core.tools import tool
 from PIL import Image
 
 from src.rnm.dataSpecs import FilePathInput
@@ -37,7 +36,6 @@ def dynamic_camera() -> str:
     return str(DYNAMIC_IMAGE_PATH)
 
 
-@tool
 def camera() -> FilePathInput:
     """
     Use a camera tool to capture an image and return its path.
@@ -53,7 +51,6 @@ def camera() -> FilePathInput:
 
 
 # Output Section
-@tool
 def display_image(image_path: FilePathInput):
     """
     Display an image to the user by decoding the base64 string and showing it using PIL.
