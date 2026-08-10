@@ -11,3 +11,4 @@ wheels/
 /temp
 .env
 /.tmp/piper_models
+/.tmp/output

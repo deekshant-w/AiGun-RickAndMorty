@@ -2,7 +2,6 @@ import collections
 import queue
 import time
 from collections.abc import Callable
-from pathlib import Path
 
 import numpy as np
 import sounddevice as sd
@@ -12,9 +11,7 @@ from openwakeword.model import Model as WakeModel
 from piper import PiperVoice, SynthesisConfig
 from piper.download_voices import download_voice
 
-from rnm.paths import TMP_DIR
-
-# logging.basicConfig(level=logging.DEBUG)
+from rnm.paths import TTS_MODEL_DIR
 
 RATE = 16000  # 16kHz - default for openwakeword, webrtcvad, and whisper
 BLOCK = 1280  # 80 ms of audio, what openwakeword likes to scan a rolling window finding the wake word
@@ -171,7 +168,7 @@ def inputLoop(callback: Callable):
 class PiperTTS:
     def __init__(self, voice_name: str = "en_US-hfc_female-medium"):
         self.voice_name = voice_name
-        self.model_dir = Path(TMP_DIR) / "piper_models"
+        self.model_dir = TTS_MODEL_DIR
         self.model_dir.mkdir(parents=True, exist_ok=True)
         self.syn_config = SynthesisConfig(length_scale=0.9, noise_scale=1.1, noise_w_scale=1.1, volume=0.4)
 
