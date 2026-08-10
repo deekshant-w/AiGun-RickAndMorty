@@ -203,6 +203,9 @@ class PiperTTS:
         thread.start()
 
 
+TTS = PiperTTS()
+
+
 def laser(count=1, delay=0.2):
     # Play a laser sound effect `count` times.
     laser_path = TMP_DIR / "laser.raw"
@@ -212,9 +215,13 @@ def laser(count=1, delay=0.2):
         with sd.OutputStream(samplerate=44100, channels=1, dtype="int16") as s:
             s.write(data)
 
-    for _ in range(count):
-        threading.Thread(target=_play).start()
-        time.sleep(delay)
+    def _delayed_play():
+        time.sleep(2)
+        for _ in range(count):
+            threading.Thread(target=_play).start()
+            time.sleep(delay)
+
+    threading.Thread(target=_delayed_play).start()
 
 
 if __name__ == "__main__":
