@@ -67,6 +67,17 @@ dev = [
     "ruff>=0.16",
 ]
 
+[tool.poe.tasks]
+fix = [
+    { cmd = "ruff check --fix ." },
+    { cmd = "ruff format ." },
+]
+lint = [
+    { cmd = "ruff check ." },
+    { cmd = "ruff format --check ." },
+]
+test = "pytest"
+
 [tool.ruff]
 line-length = 120
 

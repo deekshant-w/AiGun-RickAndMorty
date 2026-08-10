@@ -1,10 +1,12 @@
 import argparse
 import logging
 
+import dotenv
 from langchain.agents import create_agent
 
 from rnm.tools import visual_io
 
+dotenv.load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 parser = argparse.ArgumentParser(description="AI Gun - Rick and Morty Edition")
@@ -25,7 +27,7 @@ def main():
     logging.info("Starting AI Gun - Rick and Morty Edition")
     SYSTEM_PROMPT = "You are a helpful AI agent that plans before acting and uses tools to interact with the world."
     agent = create_agent(
-        model="ollama:qwen3.5:latest",
+        model="ollama:ornith:latest",
         tools=[visual_io.camera, visual_io.display_image],
         system_prompt=SYSTEM_PROMPT,
         debug=True,
