@@ -1,10 +1,12 @@
 from collections.abc import Sequence
+from uuid import uuid4
 
 import torch
+from langchain.tools import tool
 from PIL import Image, ImageDraw, ImageFont
 from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor, CLIPModel, CLIPProcessor
 
-from rnm.paths import STATIC_IMAGE_PATH
+from rnm.paths import OUTPUT_IMAGE_DIR, STATIC_IMAGE_PATH
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -64,8 +66,12 @@ def draw_cross(
     draw.line([(x + size, y - size), (x - size, y + size)], fill=color, width=width)
 
 
-def main():
-    image = Image.open(STATIC_IMAGE_PATH).convert("RGB")
+@tool(
+    "find_aliens_and_shoot",
+    description="Detects alien faces in the given image (absolute path) and shoot them. A single function that does both detection and shooting together. Returns the path to the image with bounding boxes drawn around detected faces.",
+)
+def main(image_path: str) -> str:
+    image = Image.open(image_path).convert("RGB")
     inputs = dino_processor(images=image, text=[["face"]], return_tensors="pt").to(dino_model.device)
     with torch.no_grad():
         outputs = dino_model(**inputs)
@@ -87,6 +93,10 @@ def main():
     def draw_text(position, text, color):
         draw.text((position[0], position[1] - 10), text, fill=color, font=font, anchor="ms")
 
+    count = {
+        "alien": 0,
+        "human": 0,
+    }
     for box, _score, _label_text, label, confidence in zip(
         result["boxes"], result["scores"], result["text_labels"], faces["label"], faces["confidence"], strict=True
     ):
@@ -96,12 +106,16 @@ def main():
             draw_text(((box[0] + box[2]) / 2, box[1]), f"alien:({confidence:.2f})", color="red")
             forehead_point = determine_forehead_point(box)
             draw_cross(draw, forehead_point)
+            count["alien"] += 1
         else:
             draw.rectangle(box, outline="green", width=3)
             draw_text(((box[0] + box[2]) / 2, box[1]), f"human:({confidence:.2f})", color="green")
+            count["human"] += 1
 
-    image.show()
+    output_path = OUTPUT_IMAGE_DIR / f"{uuid4()}.png"
+    image.save(output_path)
+    return f"{count['alien']} aliens shot, {count['human']} humans identified, proof:{str(output_path)}"
 
 
 if __name__ == "__main__":
-    main()
+    main(STATIC_IMAGE_PATH)
