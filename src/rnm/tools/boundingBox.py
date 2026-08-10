@@ -7,6 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor, CLIPModel, CLIPProcessor
 
 from rnm.paths import OUTPUT_IMAGE_DIR, STATIC_IMAGE_PATH
+from rnm.tools.audio_io import TTS, laser
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -71,6 +72,7 @@ def draw_cross(
     description="Detects alien faces in the given image (absolute path) and shoot them. A single function that does both detection and shooting together. Returns the path to the image with bounding boxes drawn around detected faces.",
 )
 def main(image_path: str) -> str:
+    TTS.play("Initializing... Scanning for alien faces")
     image = Image.open(image_path).convert("RGB")
     inputs = dino_processor(images=image, text=[["face"]], return_tensors="pt").to(dino_model.device)
     with torch.no_grad():
@@ -114,6 +116,7 @@ def main(image_path: str) -> str:
 
     output_path = OUTPUT_IMAGE_DIR / f"{uuid4()}.png"
     image.save(output_path)
+    laser(count=count["alien"])
     return f"{count['alien']} aliens shot, {count['human']} humans identified, proof:{str(output_path)}"
 
 
