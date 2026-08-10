@@ -3,6 +3,7 @@ import logging
 
 import dotenv
 from langchain.agents import create_agent
+from langchain.agents.middleware import TodoListMiddleware
 
 from rnm.tools import visual_io
 
@@ -25,10 +26,15 @@ def main():
     process_args(parser.parse_args())
 
     logging.info("Starting AI Gun - Rick and Morty Edition")
-    SYSTEM_PROMPT = "You are a helpful AI agent that plans before acting and uses tools to interact with the world."
+    SYSTEM_PROMPT = """
+You are helpful Super AI Gun agent that plans before acting.
+Decide what information you need and which tools to use.
+Execute tools as necessary, then provide the final answer.
+"""
     agent = create_agent(
         model="ollama:ornith:latest",
         tools=[visual_io.camera, visual_io.display_image],
+        middleware=[TodoListMiddleware()],
         system_prompt=SYSTEM_PROMPT,
         debug=True,
     )
