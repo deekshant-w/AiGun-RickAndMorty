@@ -1,5 +1,6 @@
 import collections
 import queue
+import threading
 import time
 from collections.abc import Callable
 
@@ -11,7 +12,7 @@ from openwakeword.model import Model as WakeModel
 from piper import PiperVoice, SynthesisConfig
 from piper.download_voices import download_voice
 
-from rnm.paths import TTS_MODEL_DIR
+from rnm.paths import TMP_DIR, TTS_MODEL_DIR
 
 RATE = 16000  # 16kHz - default for openwakeword, webrtcvad, and whisper
 BLOCK = 1280  # 80 ms of audio, what openwakeword likes to scan a rolling window finding the wake word
@@ -202,11 +203,27 @@ class PiperTTS:
         thread.start()
 
 
+def laser(count=1, delay=0.2):
+    # Play a laser sound effect `count` times.
+    laser_path = TMP_DIR / "laser.raw"
+
+    def _play():
+        data = np.fromfile(laser_path, dtype=np.int16)
+        with sd.OutputStream(samplerate=44100, channels=1, dtype="int16") as s:
+            s.write(data)
+
+    for _ in range(count):
+        threading.Thread(target=_play).start()
+        time.sleep(delay)
+
+
 if __name__ == "__main__":
     # try:
     #     inputLoop(defaultCallback)
     # except KeyboardInterrupt:
     #     print("\nstopped")
 
-    tts = PiperTTS()
-    tts.play("Hello, I am your AI assistant. How can I help you today?")
+    # tts = PiperTTS()
+    # tts.play("Hello, I am your AI assistant. How can I help you today?")
+
+    laser(5)
