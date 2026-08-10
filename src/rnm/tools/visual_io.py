@@ -4,7 +4,7 @@ import cv2
 from langchain.tools import tool
 from PIL import Image
 
-from rnm.paths import DYNAMIC_IMAGE_PATH, STATIC_IMAGE_PATH, TMP_DIR
+from rnm.config import DYNAMIC_IMAGE_PATH, STATIC_IMAGE_PATH, TMP_DIR
 
 logger = logging.getLogger(__name__)
 

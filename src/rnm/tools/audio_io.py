@@ -12,7 +12,7 @@ from openwakeword.model import Model as WakeModel
 from piper import PiperVoice, SynthesisConfig
 from piper.download_voices import download_voice
 
-from rnm.paths import TMP_DIR, TTS_MODEL_DIR
+from rnm.config import TMP_DIR, TTS_MODEL_DIR
 
 RATE = 16000  # 16kHz - default for openwakeword, webrtcvad, and whisper
 BLOCK = 1280  # 80 ms of audio, what openwakeword likes to scan a rolling window finding the wake word
