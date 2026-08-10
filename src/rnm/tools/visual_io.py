@@ -34,8 +34,11 @@ def dynamic_camera() -> str:
     return str(DYNAMIC_IMAGE_PATH)
 
 
-@tool
-def camera() -> dict:
+@tool(
+    "camera",
+    description="Use a camera tool to capture an image and return its path. Display the image to the user after capturing it.",
+)
+def camera() -> str:
     """
     Use a camera tool to capture an image and return its path.
     """
@@ -46,11 +49,14 @@ def camera() -> dict:
         logger.info("Using static camera feed.")
         image_path = static_camera()
     print(f"Image captured at: {image_path}")
-    return {"path": image_path}
+    return f"Image captured at: {image_path}. Now display the image to the user using the display tool."
 
 
 # Output Section
-@tool
+@tool(
+    "display_image",
+    description="Display an image to the user. Alwasys display the image if the previous tool returns an image path.",
+)
 def display_image(image_path: str) -> str:
     """
     Display an image to the user.

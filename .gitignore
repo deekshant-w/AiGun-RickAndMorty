@@ -12,3 +12,4 @@ wheels/
 .env
 /.tmp/piper_models
 /.tmp/output
+/.tmp/tts_model
