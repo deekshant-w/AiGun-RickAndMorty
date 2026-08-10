@@ -2,12 +2,17 @@ import collections
 import queue
 import time
 from collections.abc import Callable
+from pathlib import Path
 
 import numpy as np
 import sounddevice as sd
 import webrtcvad
 from faster_whisper import WhisperModel
 from openwakeword.model import Model as WakeModel
+from piper import PiperVoice, SynthesisConfig
+from piper.download_voices import download_voice
+
+from rnm.paths import TMP_DIR
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -72,7 +77,7 @@ def drain_stale(q: queue.Queue, keep: int = 1) -> int:
     return dropped
 
 
-def main(callback: Callable):
+def inputLoop(callback: Callable):
     print("loading models...")
     wake = WakeModel(
         wakeword_models=[WAKE_WORD], inference_framework="onnx"
@@ -163,8 +168,48 @@ def main(callback: Callable):
             #         ).start()
 
 
+class PiperTTS:
+    def __init__(self, voice_name: str = "en_US-hfc_female-medium"):
+        self.voice_name = voice_name
+        self.model_dir = Path(TMP_DIR) / "piper_models"
+        self.model_dir.mkdir(parents=True, exist_ok=True)
+        self.syn_config = SynthesisConfig(length_scale=0.9, noise_scale=1.1, noise_w_scale=1.1, volume=0.4)
+
+        model_path = self.model_dir / f"{voice_name}.onnx"
+        config_path = self.model_dir / f"{voice_name}.onnx.json"
+
+        if not model_path.exists() or not config_path.exists():
+            download_voice(voice_name, self.model_dir)
+
+        self.voice = PiperVoice.load(str(model_path))
+
+    def play(self, text: str):
+        stream = None
+        for chunk in self.voice.synthesize(text, syn_config=self.syn_config):
+            if stream is None:
+                stream = sd.RawOutputStream(
+                    samplerate=chunk.sample_rate,
+                    channels=chunk.sample_channels,
+                    dtype="int16",
+                )
+                stream.start()
+            stream.write(chunk.audio_int16_bytes)
+        if stream:
+            stream.stop()
+            stream.close()
+
+    def play_async(self, text: str):
+        import threading
+
+        thread = threading.Thread(target=self.play, args=(text,))
+        thread.start()
+
+
 if __name__ == "__main__":
-    try:
-        main(defaultCallback)
-    except KeyboardInterrupt:
-        print("\nstopped")
+    # try:
+    #     inputLoop(defaultCallback)
+    # except KeyboardInterrupt:
+    #     print("\nstopped")
+
+    tts = PiperTTS()
+    tts.play("Hello, I am your AI assistant. How can I help you today?")

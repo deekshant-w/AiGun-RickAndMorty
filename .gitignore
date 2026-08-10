@@ -10,3 +10,4 @@ wheels/
 .venv
 /temp
 .env
+/.tmp/piper_models

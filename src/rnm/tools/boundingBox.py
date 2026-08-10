@@ -101,3 +101,7 @@ def main():
             draw_text(((box[0] + box[2]) / 2, box[1]), f"human:({confidence:.2f})", color="green")
 
     image.show()
+
+
+if __name__ == "__main__":
+    main()
