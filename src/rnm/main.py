@@ -19,6 +19,11 @@ parser.add_argument(
     help="Disable audio output.",
 )
 parser.add_argument(
+    "--dummy_run",
+    action="store_true",
+    help="Run the LLM script without voice input.",
+)
+parser.add_argument(
     "--model",
     type=str,
     help="Specify the model to use for the agent.",
@@ -106,12 +111,14 @@ Special and important instructions:
 
 def main():
     process_args(args)
+    if args.dummy_run:
+        llm("Take a picture using the camera, find the alien faces, and shoot them.")
+        return
     print("Starting AI Gun - Rick and Morty Edition")
     try:
         inputLoop(llm)
     except KeyboardInterrupt:
         misc_tools.stop()
-    # llm("Take a picture using the camera, find the alien faces, and shoot them.")
 
 
 if __name__ == "__main__":
