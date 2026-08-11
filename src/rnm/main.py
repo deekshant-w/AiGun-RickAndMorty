@@ -25,11 +25,15 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+import random
+import threading
+
 import dotenv
 from langchain.agents import create_agent
 
 import rnm.config as C
 import rnm.tools.misc_tools as misc_tools
+from rnm.tools.audio_io import inputLoop
 from rnm.tools.boundingBox import main as bounding_box_tool
 from rnm.tools.visual_io import camera, display_image
 
@@ -44,6 +48,19 @@ def process_args(args):
         C.model = args.model
 
 
+class Loader:
+    file = C.THINKING_WORDS
+    with open(file) as f:
+        words = f.read().strip().split(", ")
+
+    @classmethod
+    def loading(cls):
+        def _():
+            print(f"{random.choice(cls.words)}...")
+
+        threading.Thread(target=_).start()
+
+
 def llm(user_input: str):
     """
     Agent creation and invocation function.
@@ -52,6 +69,7 @@ def llm(user_input: str):
         user_input (str): The input string from the user. Audio to text input.
     """
     print(f"User input: {user_input}")
+    Loader.loading()
     SYSTEM_PROMPT = """
 You are helpful Super AI Gun agent that plans before acting. Use the tools available to you to accomplish the user's request.
 Decide what information you need and which tools to use before responding.
@@ -85,8 +103,11 @@ Special and important instructions:
 def main():
     process_args(args)
     print("Starting AI Gun - Rick and Morty Edition")
-    # inputLoop(llm)
-    llm("Take a picture using the camera, find the alien faces, and shoot them.")
+    try:
+        inputLoop(llm)
+    except KeyboardInterrupt:
+        misc_tools.stop()
+    # llm("Take a picture using the camera, find the alien faces, and shoot them.")
 
 
 if __name__ == "__main__":

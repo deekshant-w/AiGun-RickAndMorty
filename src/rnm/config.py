@@ -14,6 +14,14 @@ DYNAMIC_IMAGE_PATH = TMP_DIR / "tmp.png"
 TTS_MODEL_DIR = TMP_DIR / "tts_model"
 TTS_MODEL_DIR.mkdir(exist_ok=True)
 
+THINKING_WORDS = PROJECT_ROOT / "src" / "thinking.txt"
+if not THINKING_WORDS.exists():
+    raise FileNotFoundError(f"Thinking words file not found at {THINKING_WORDS}")
+
+LASER_PATH = PROJECT_ROOT / "src" / "laser.raw"
+if not LASER_PATH.exists():
+    raise FileNotFoundError(f"Laser file not found at {LASER_PATH}")
+
 OUTPUT_IMAGE_DIR = TMP_DIR / "output"
 OUTPUT_IMAGE_DIR.mkdir(exist_ok=True)
 
