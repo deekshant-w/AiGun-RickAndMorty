@@ -52,6 +52,9 @@ def display_image(image_path: str) -> str:
     """
     Display an image to the user.
     """
-    img = Image.open(image_path)
-    img.show()
-    return "Image displayed."
+    try:
+        img = Image.open(image_path)
+        img.show()
+        return "Image displayed."
+    except Exception as e:
+        return f"Failed to display image: {e}"
