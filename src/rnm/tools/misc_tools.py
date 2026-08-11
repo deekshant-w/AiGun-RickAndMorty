@@ -11,7 +11,7 @@ def date():
     return datetime.datetime.now().strftime("%Y-%m-%d")
 
 
-def calulator(mathematical_expression: str):
+def calculator(mathematical_expression: str):
     """Evaluate a mathematical expression and return the result."""
     try:
         result = eval(mathematical_expression)
@@ -26,4 +26,4 @@ def stop():
     exit(0)
 
 
-misc_tools = [time, date, calulator, stop]
+misc_tools = [time, date, calculator, stop]
