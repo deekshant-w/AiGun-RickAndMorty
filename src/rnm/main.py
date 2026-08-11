@@ -27,6 +27,7 @@ args = parser.parse_args()
 
 import random
 import threading
+from pathlib import Path
 
 import dotenv
 from langchain.agents import create_agent
@@ -41,6 +42,9 @@ dotenv.load_dotenv()
 
 
 def process_args(args):
+    if args.image_path:
+        assert Path(args.image_path).exists()
+        C.STATIC_IMAGE_PATH = args.image_path
     C.USE_REAL_CAMERA = args.use_real_camera
     C.DEBUG = args.debug
     C.AUDIO_OUTPUT = not args.disable_audio_output
