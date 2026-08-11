@@ -4,20 +4,16 @@ import cv2
 from langchain.tools import tool
 from PIL import Image
 
-from rnm.config import DYNAMIC_IMAGE_PATH, STATIC_IMAGE_PATH, TMP_DIR
+import rnm.config as C
 
 logger = logging.getLogger(__name__)
-
-# Input Sectioin
-
-USE_REAL_CAMERA = True
 
 
 def static_camera() -> str:
     """
     Simulate a camera, and return the path to a pre-defined static image.
     """
-    return str(STATIC_IMAGE_PATH)
+    return str(C.STATIC_IMAGE_PATH)
 
 
 def dynamic_camera() -> str:
@@ -29,9 +25,9 @@ def dynamic_camera() -> str:
     if not ret:
         raise RuntimeError("Failed to capture image from camera.")
     cam.release()
-    TMP_DIR.mkdir(exist_ok=True)
-    cv2.imwrite(str(DYNAMIC_IMAGE_PATH), frame)
-    return str(DYNAMIC_IMAGE_PATH)
+    C.TMP_DIR.mkdir(exist_ok=True)
+    cv2.imwrite(str(C.DYNAMIC_IMAGE_PATH), frame)
+    return str(C.DYNAMIC_IMAGE_PATH)
 
 
 @tool(
@@ -42,7 +38,7 @@ def camera() -> str:
     """
     Use a camera tool to capture an image and return its path.
     """
-    if USE_REAL_CAMERA:
+    if C.USE_REAL_CAMERA:
         logger.info("Using real camera feed.")
         image_path = dynamic_camera()
     else:
@@ -52,7 +48,6 @@ def camera() -> str:
     return f"Image captured at: {image_path}. Now display the image to the user using the display tool."
 
 
-# Output Section
 @tool(
     "display_image",
     description="Display an image to the user. Alwasys display the image if the previous tool returns an image path.",

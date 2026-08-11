@@ -84,4 +84,7 @@ line-length = 120
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
-ignore = ["E501"] # line length is the formatter's job
+ignore = [
+    "E501", # line length is the formatter's job
+    "E402", # imports after sys.path/env setup are intentional
+]

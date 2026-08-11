@@ -6,7 +6,7 @@ from langchain.tools import tool
 from PIL import Image, ImageDraw, ImageFont
 from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor, CLIPModel, CLIPProcessor
 
-from rnm.config import OUTPUT_IMAGE_DIR, STATIC_IMAGE_PATH
+import rnm.config as C
 from rnm.tools.audio_io import TTS, laser
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -114,11 +114,12 @@ def main(image_path: str) -> str:
             draw_text(((box[0] + box[2]) / 2, box[1]), f"human:({confidence:.2f})", color="green")
             count["human"] += 1
 
-    output_path = OUTPUT_IMAGE_DIR / f"{uuid4()}.png"
+    output_path = C.OUTPUT_IMAGE_DIR / f"{uuid4()}.png"
     image.save(output_path)
+    print(f"Output image saved at: {output_path}")
     laser(count=count["alien"])
     return f"{count['alien']} aliens shot, {count['human']} humans identified, proof:{str(output_path)}"
 
 
 if __name__ == "__main__":
-    main(STATIC_IMAGE_PATH)
+    main.func(str(C.STATIC_IMAGE_PATH))

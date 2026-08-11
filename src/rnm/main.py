@@ -1,30 +1,55 @@
 import argparse
+
+parser = argparse.ArgumentParser(description="AI Gun - Rick and Morty Edition")
+parser.add_argument("image_path", type=str, help="Optional path to the input image.", nargs="?")
+parser.add_argument(
+    "--use_real_camera",
+    action="store_true",
+    help="Use a real camera feed instead of a static image.",
+)
+parser.add_argument(
+    "-d",
+    "--debug",
+    action="store_true",
+    help="Enable debug logging.",
+)
+parser.add_argument(
+    "--audio_output",
+    action="store_true",
+    help="Enable audio output.",
+)
+parser.add_argument(
+    "--model",
+    type=str,
+    help="Specify the model to use for the agent.",
+)
+args = parser.parse_args()
+
 import logging
 
 import dotenv
 from langchain.agents import create_agent
 
-from rnm.tools import visual_io
+import rnm.config as C
 from rnm.tools.boundingBox import main as bounding_box_tool
 from rnm.tools.visual_io import camera, display_image
 
 dotenv.load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
-parser = argparse.ArgumentParser(description="AI Gun - Rick and Morty Edition")
-parser.add_argument(
-    "--use_real_camera",
-    action="store_true",
-    help="Use a real camera feed instead of a static image.",
-)
-
 
 def process_args(args):
-    visual_io.USE_REAL_CAMERA = args.use_real_camera
+    print(f"Arguments: {args}")
+    exit()
+    C.USE_REAL_CAMERA = args.use_real_camera
+    C.DEBUG = args.debug
+    C.AUDIO_OUTPUT = args.audio_output
+    if args.model:
+        C.model = args.model
 
 
 def main():
-    process_args(parser.parse_args())
+    process_args(args)
 
     logging.info("Starting AI Gun - Rick and Morty Edition")
     SYSTEM_PROMPT = """
@@ -39,19 +64,21 @@ Special and important instructions:
 """
     agent = create_agent(
         # model="ollama:qwen3.5:4b",
-        model="ollama:granite4.1:3b",
+        # model="ollama:granite4.1:3b",
+        model=f"ollama:{C.model}",
         # model="ollama:qwen3:4b",
         # model="ollama:ornith:latest",
         tools=[camera, display_image, bounding_box_tool],
         # middleware=[TodoListMiddleware()],
         system_prompt=SYSTEM_PROMPT,
-        debug=True,
+        debug=C.DEBUG,
     )
     result = agent.invoke(
         {
             "messages": [
                 {
                     "role": "user",
+                    # "content": "Take a picture using the camera, find the alien faces, and shoot them.",
                     "content": "Take a picture using the camera, find the alien faces, and shoot them.",
                 }
             ]
