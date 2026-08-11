@@ -29,6 +29,7 @@ import dotenv
 from langchain.agents import create_agent
 
 import rnm.config as C
+import rnm.tools.misc_tools as misc_tools
 from rnm.tools.boundingBox import main as bounding_box_tool
 from rnm.tools.visual_io import camera, display_image
 
@@ -63,7 +64,7 @@ Special and important instructions:
 """
     agent = create_agent(
         model=f"ollama:{C.model}",
-        tools=[camera, display_image, bounding_box_tool],
+        tools=[camera, display_image, bounding_box_tool, *misc_tools.misc_tools],
         # middleware=[TodoListMiddleware()],
         system_prompt=SYSTEM_PROMPT,
         debug=C.DEBUG,
