@@ -114,7 +114,8 @@ def algorithm(image_path: str) -> str:
             count["human"] += 1
 
     output_path = C.OUTPUT_IMAGE_DIR / f"{uuid4()}.png"
-    image.save(output_path)
+    image.show()
+    # image.save(output_path)
     print(f"Output image saved at: {output_path}")
     laser(count=count["alien"])
     return f"{count['alien']} aliens shot, {count['human']} humans identified, proof:{str(output_path)}"
@@ -122,4 +123,7 @@ def algorithm(image_path: str) -> str:
 
 def main():
     C.AUDIO_OUTPUT = False
-    algorithm.func(str(C.TMP_DIR / "alien5.png"))
+    algorithm.func(str(C.TMP_DIR / "alien1.png"))
+    algorithm.func(str(C.TMP_DIR / "alien2.png"))
+    algorithm.func(str(C.TMP_DIR / "alien3.png"))
+    algorithm.func(str(C.TMP_DIR / "alien4.png"))
