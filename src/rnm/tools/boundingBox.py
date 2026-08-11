@@ -19,11 +19,7 @@ DINO_MODEL_ID = "IDEA-Research/grounding-dino-tiny"
 dino_processor = AutoProcessor.from_pretrained(DINO_MODEL_ID)
 dino_model = AutoModelForZeroShotObjectDetection.from_pretrained(DINO_MODEL_ID).to(device)
 
-LABELS = [
-    "real human face / a cartoon human face",
-    "alien face",
-    "not a face",
-]
+LABELS = C.CLASSIFICATION_LABELS
 
 
 def classify_faces(images: list[Image.Image], labels: list[str]) -> dict:
@@ -36,8 +32,11 @@ def classify_faces(images: list[Image.Image], labels: list[str]) -> dict:
 
 
 def is_alien_face(label: str) -> bool:
-    normalized = label.lower()
-    return "alien" in normalized
+    return "alien" in label.lower()
+
+
+def is_human_face(label: str) -> bool:
+    return "human" in label.lower()
 
 
 def determine_forehead_point(box: Sequence[float]) -> tuple[int, int]:
@@ -87,7 +86,7 @@ def algorithm(image_path: str) -> str:
     )
     result = results[0]
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype("arialbd.ttf", 20)
+    font = ImageFont.truetype("arialbd.ttf", 24)
     faces = classify_faces(
         [image.crop((int(box[0]), int(box[1]), int(box[2]), int(box[3]))) for box in result["boxes"]], LABELS
     )
@@ -109,7 +108,7 @@ def algorithm(image_path: str) -> str:
             forehead_point = determine_forehead_point(box)
             draw_cross(draw, forehead_point)
             count["alien"] += 1
-        else:
+        elif is_human_face(label):
             draw.rectangle(box, outline="green", width=3)
             draw_text(((box[0] + box[2]) / 2, box[1]), f"human:({confidence:.2f})", color="green")
             count["human"] += 1
@@ -123,4 +122,4 @@ def algorithm(image_path: str) -> str:
 
 def main():
     C.AUDIO_OUTPUT = False
-    algorithm.func(str(C.TMP_DIR / "alien.png"))
+    algorithm.func(str(C.TMP_DIR / "alien5.png"))

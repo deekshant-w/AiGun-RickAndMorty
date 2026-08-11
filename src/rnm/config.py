@@ -35,3 +35,20 @@ AUDIO_OUTPUT = True
 model = "granite4.1:3b"
 # model = "qwen3:4b",
 # model = "ornith:latest",
+
+CLASSIFICATION_LABELS = [
+    "real human face",
+    "cartoon human face",
+    "human side eye",
+    "human handcuffed",
+    "alien face",
+    "alien backhead",
+    "animal alien",
+    "cartoon alien",
+    "alien side face with one eye",
+    "alien holding a gun",
+    "alient looking animal",
+    "alien animal eyes",
+    "scary alien head",
+    "not a face",
+]
