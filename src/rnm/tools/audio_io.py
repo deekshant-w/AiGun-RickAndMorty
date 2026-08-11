@@ -76,6 +76,9 @@ def drain_stale(q: queue.Queue, keep: int = 1) -> int:
 
 
 def inputLoop(callback: Callable):
+    def init():
+        print(f"listening for '{WAKE_WORD}'. ctrl+c to quit.")
+
     print("loading models...")
     wake = WakeModel(
         wakeword_models=[WAKE_WORD], inference_framework="onnx"
@@ -103,7 +106,7 @@ def inputLoop(callback: Callable):
     )
 
     with stream:
-        print(f"listening for '{WAKE_WORD}'. ctrl+c to quit.")
+        init()
         while True:
             if not wakeWordDetected and audio_q.qsize() > MAX_LAG_BLOCKS:
                 dropped = drain_stale(audio_q)
@@ -157,6 +160,7 @@ def inputLoop(callback: Callable):
                 done = False
                 transcribe_and_dispatch(stt, frameInput, callback)
                 drain_stale(audio_q, 0)
+                init()
             # else:
             #     if len(frames) > 0 and len(frames) % DISPLAY_AFTER_EVERY_N == 0:
             #         threading.Thread(
