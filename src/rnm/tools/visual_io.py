@@ -1,12 +1,8 @@
-import logging
-
 import cv2
 from langchain.tools import tool
 from PIL import Image
 
 import rnm.config as C
-
-logger = logging.getLogger(__name__)
 
 
 def static_camera() -> str:
@@ -39,10 +35,10 @@ def camera() -> str:
     Use a camera tool to capture an image and return its path.
     """
     if C.USE_REAL_CAMERA:
-        logger.info("Using real camera feed.")
+        print("Using real camera feed.")
         image_path = dynamic_camera()
     else:
-        logger.info("Using static camera feed.")
+        print("Using static camera feed.")
         image_path = static_camera()
     print(f"Image captured at: {image_path}")
     return f"Image captured at: {image_path}. Now display the image to the user using the display tool."

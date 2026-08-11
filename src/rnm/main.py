@@ -14,9 +14,9 @@ parser.add_argument(
     help="Enable debug logging.",
 )
 parser.add_argument(
-    "--audio_output",
+    "--disable_audio_output",
     action="store_true",
-    help="Enable audio output.",
+    help="Disable audio output.",
 )
 parser.add_argument(
     "--model",
@@ -24,8 +24,6 @@ parser.add_argument(
     help="Specify the model to use for the agent.",
 )
 args = parser.parse_args()
-
-import logging
 
 import dotenv
 from langchain.agents import create_agent
@@ -35,23 +33,24 @@ from rnm.tools.boundingBox import main as bounding_box_tool
 from rnm.tools.visual_io import camera, display_image
 
 dotenv.load_dotenv()
-logging.basicConfig(level=logging.INFO)
 
 
 def process_args(args):
-    print(f"Arguments: {args}")
-    exit()
     C.USE_REAL_CAMERA = args.use_real_camera
     C.DEBUG = args.debug
-    C.AUDIO_OUTPUT = args.audio_output
+    C.AUDIO_OUTPUT = not args.disable_audio_output
     if args.model:
         C.model = args.model
 
 
-def main():
-    process_args(args)
+def llm(user_input: str):
+    """
+    Agent creation and invocation function.
 
-    logging.info("Starting AI Gun - Rick and Morty Edition")
+    Args:
+        user_input (str): The input string from the user. Audio to text input.
+    """
+    print(f"User input: {user_input}")
     SYSTEM_PROMPT = """
 You are helpful Super AI Gun agent that plans before acting. Use the tools available to you to accomplish the user's request.
 Decide what information you need and which tools to use before responding.
@@ -63,11 +62,7 @@ Special and important instructions:
 - If any tool returns an image path, always display the image to the user (even if the user did not explicitly ask for it).
 """
     agent = create_agent(
-        # model="ollama:qwen3.5:4b",
-        # model="ollama:granite4.1:3b",
         model=f"ollama:{C.model}",
-        # model="ollama:qwen3:4b",
-        # model="ollama:ornith:latest",
         tools=[camera, display_image, bounding_box_tool],
         # middleware=[TodoListMiddleware()],
         system_prompt=SYSTEM_PROMPT,
@@ -78,13 +73,19 @@ Special and important instructions:
             "messages": [
                 {
                     "role": "user",
-                    # "content": "Take a picture using the camera, find the alien faces, and shoot them.",
-                    "content": "Take a picture using the camera, find the alien faces, and shoot them.",
+                    "content": user_input,
                 }
             ]
         },
     )
-    print(result["messages"][-1].content)
+    print(f">> {result['messages'][-1].content}")
+
+
+def main():
+    process_args(args)
+    print("Starting AI Gun - Rick and Morty Edition")
+    # inputLoop(llm)
+    llm("Take a picture using the camera, find the alien faces, and shoot them.")
 
 
 if __name__ == "__main__":

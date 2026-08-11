@@ -13,3 +13,4 @@ wheels/
 /.tmp/piper_models
 /.tmp/output
 /.tmp/tts_model
+.tmp/tmp.png
