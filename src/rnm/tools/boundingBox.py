@@ -20,8 +20,8 @@ dino_processor = AutoProcessor.from_pretrained(DINO_MODEL_ID)
 dino_model = AutoModelForZeroShotObjectDetection.from_pretrained(DINO_MODEL_ID).to(device)
 
 LABELS = [
-    "a photograph of a real human face",
-    "a cartoon or alien face, animated, illustrated",
+    "real human face / a cartoon human face",
+    "alien face",
     "not a face",
 ]
 
@@ -37,7 +37,7 @@ def classify_faces(images: list[Image.Image], labels: list[str]) -> dict:
 
 def is_alien_face(label: str) -> bool:
     normalized = label.lower()
-    return "alien" in normalized or "cartoon" in normalized
+    return "alien" in normalized
 
 
 def determine_forehead_point(box: Sequence[float]) -> tuple[int, int]:
@@ -71,7 +71,7 @@ def draw_cross(
     "find_aliens_and_shoot",
     description="Detects alien faces in the given image (absolute path) and shoot them. A single function that does both detection and shooting together. Returns the path to the image with bounding boxes drawn around detected faces.",
 )
-def main(image_path: str) -> str:
+def algorithm(image_path: str) -> str:
     TTS.play("Initializing... Scanning for alien faces")
     image = Image.open(image_path).convert("RGB")
     inputs = dino_processor(images=image, text=[["face"]], return_tensors="pt").to(dino_model.device)
@@ -87,7 +87,7 @@ def main(image_path: str) -> str:
     )
     result = results[0]
     draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype("arialbd.ttf", 24)
+    font = ImageFont.truetype("arialbd.ttf", 20)
     faces = classify_faces(
         [image.crop((int(box[0]), int(box[1]), int(box[2]), int(box[3]))) for box in result["boxes"]], LABELS
     )
@@ -121,5 +121,6 @@ def main(image_path: str) -> str:
     return f"{count['alien']} aliens shot, {count['human']} humans identified, proof:{str(output_path)}"
 
 
-if __name__ == "__main__":
-    main.func(str(C.STATIC_IMAGE_PATH))
+def main():
+    C.AUDIO_OUTPUT = False
+    algorithm.func(str(C.TMP_DIR / "alien.png"))

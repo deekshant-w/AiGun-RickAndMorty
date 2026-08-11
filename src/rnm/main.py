@@ -40,7 +40,7 @@ from langchain.agents import create_agent
 import rnm.config as C
 import rnm.tools.misc_tools as misc_tools
 from rnm.tools.audio_io import inputLoop
-from rnm.tools.boundingBox import main as bounding_box_tool
+from rnm.tools.boundingBox import algorithm as bounding_box_tool
 from rnm.tools.visual_io import camera, display_image
 
 dotenv.load_dotenv()
