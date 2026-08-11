@@ -214,13 +214,11 @@ TTS = PiperTTS()
 
 def laser(count=1, delay=0.2):
     # Play a laser sound effect `count` times.
-    laser_path = C.TMP_DIR / "laser.raw"
-
     if not C.AUDIO_OUTPUT:
         return
 
     def _play():
-        data = np.fromfile(laser_path, dtype=np.int16)
+        data = np.fromfile(C.LASER_PATH, dtype=np.int16)
         with sd.OutputStream(samplerate=44100, channels=1, dtype="int16") as s:
             s.write(data)
 
