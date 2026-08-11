@@ -20,4 +20,10 @@ def calulator(mathematical_expression: str):
         return f"Invalid mathematical expression: {e}"
 
 
-misc_tools = [time, date, calulator]
+def stop():
+    """Call this function if the user says 'stop', 'quit', or 'exit' to terminate the program."""
+    print("Rick and Morty AI Gun is shutting down. Goodbye! - Deekshant Wadhwa")
+    exit(0)
+
+
+misc_tools = [time, date, calulator, stop]
