@@ -37,10 +37,12 @@ model = "granite4.1:3b"
 # model = "ornith:latest",
 
 CLASSIFICATION_LABELS = [
+    # Human
     "real human face",
     "cartoon human face",
     "human side eye",
     "human handcuffed",
+    # Alien
     "alien face",
     "alien backhead",
     "animal alien",
@@ -50,5 +52,6 @@ CLASSIFICATION_LABELS = [
     "alient looking animal",
     "alien animal eyes",
     "scary alien head",
+    # other
     "not a face",
 ]

@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw, ImageFont
 from transformers import AutoModelForZeroShotObjectDetection, AutoProcessor, CLIPModel, CLIPProcessor
 
 import rnm.config as C
-from rnm.tools.audio_io import TTS, laser
+from rnm.tools.audio_io import TTS
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -87,6 +87,8 @@ def algorithm(image_path: str) -> str:
     result = results[0]
     draw = ImageDraw.Draw(image)
     font = ImageFont.truetype("arialbd.ttf", 24)
+    if len(result["boxes"]) == 0:
+        raise Exception("No faces found")
     faces = classify_faces(
         [image.crop((int(box[0]), int(box[1]), int(box[2]), int(box[3]))) for box in result["boxes"]], LABELS
     )
@@ -114,16 +116,14 @@ def algorithm(image_path: str) -> str:
             count["human"] += 1
 
     output_path = C.OUTPUT_IMAGE_DIR / f"{uuid4()}.png"
-    image.show()
-    # image.save(output_path)
+    image.save(output_path)
     print(f"Output image saved at: {output_path}")
-    laser(count=count["alien"])
     return f"{count['alien']} aliens shot, {count['human']} humans identified, proof:{str(output_path)}"
 
 
 def main():
     C.AUDIO_OUTPUT = False
     algorithm.func(str(C.TMP_DIR / "alien1.png"))
-    algorithm.func(str(C.TMP_DIR / "alien2.png"))
-    algorithm.func(str(C.TMP_DIR / "alien3.png"))
-    algorithm.func(str(C.TMP_DIR / "alien4.png"))
+    algorithm.func(str(C.TMP_DIR / "alien2.jpg"))
+    algorithm.func(str(C.TMP_DIR / "alien3.jpg"))
+    algorithm.func(str(C.TMP_DIR / "alien4.jpg"))

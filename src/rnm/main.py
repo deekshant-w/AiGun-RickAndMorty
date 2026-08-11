@@ -48,7 +48,7 @@ dotenv.load_dotenv()
 
 def process_args(args):
     if args.image_path:
-        assert Path(args.image_path).exists()
+        assert Path(args.image_path).exists(), "The image path you have provided does not exist."
         C.STATIC_IMAGE_PATH = args.image_path
     C.USE_REAL_CAMERA = args.use_real_camera
     C.DEBUG = args.debug
