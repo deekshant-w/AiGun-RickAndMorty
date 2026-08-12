@@ -68,8 +68,8 @@ GroundingDINO will happily return several boxes for a single face based on its t
 
 | Without Overlap removal | Overlap removed |
 | --- | --- |
-| ![input 1](assets/3-bad.jpg) | ![output 1](assets/3.jpg) |
-| ![input 1](assets/4-bad.jpg) | ![output 1](assets/4.jpg) |
+| ![bad 1](assets/3-bad.jpg) | ![good 1](assets/3.jpg) |
+| ![bad 2](assets/4-bad.jpg) | ![good 2](assets/4.jpg) |
 
 Merging runs separately on each category, which guarantees that an alien box can never absorb a neighbouring human one. Two boxes are treated as the same detection when the fraction below reaches `MERGE_THRESHOLD`, at which point they are replaced by the smallest box that contains both of them:
 
