@@ -2,14 +2,14 @@ import cv2
 from langchain.tools import tool
 from PIL import Image
 
-import rnm.config as C
+import rnm.config as CONFIG
 
 
 def static_camera() -> str:
     """
     Simulate a camera, and return the path to a pre-defined static image.
     """
-    return str(C.STATIC_IMAGE_PATH)
+    return str(CONFIG.STATIC_IMAGE_PATH)
 
 
 def dynamic_camera() -> str:
@@ -21,9 +21,9 @@ def dynamic_camera() -> str:
     if not ret:
         raise RuntimeError("Failed to capture image from camera.")
     cam.release()
-    C.TMP_DIR.mkdir(exist_ok=True)
-    cv2.imwrite(str(C.DYNAMIC_IMAGE_PATH), frame)
-    return str(C.DYNAMIC_IMAGE_PATH)
+    CONFIG.TMP_DIR.mkdir(exist_ok=True)
+    cv2.imwrite(str(CONFIG.DYNAMIC_IMAGE_PATH), frame)
+    return str(CONFIG.DYNAMIC_IMAGE_PATH)
 
 
 @tool(
@@ -34,7 +34,7 @@ def camera() -> str:
     """
     Use a camera tool to capture an image and return its path.
     """
-    if C.USE_REAL_CAMERA:
+    if CONFIG.USE_REAL_CAMERA:
         print("Using real camera feed.")
         image_path = dynamic_camera()
     else:

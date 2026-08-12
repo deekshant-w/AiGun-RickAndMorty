@@ -37,7 +37,7 @@ from pathlib import Path
 import dotenv
 from langchain.agents import create_agent
 
-import rnm.config as C
+import rnm.config as CONFIG
 import rnm.tools.misc_tools as misc_tools
 from rnm.tools.audio_io import inputLoop
 from rnm.tools.boundingBox import algorithm as bounding_box_tool
@@ -49,16 +49,16 @@ dotenv.load_dotenv()
 def process_args(args):
     if args.image_path:
         assert Path(args.image_path).exists(), "The image path you have provided does not exist."
-        C.STATIC_IMAGE_PATH = args.image_path
-    C.USE_REAL_CAMERA = args.use_real_camera
-    C.DEBUG = args.debug
-    C.AUDIO_OUTPUT = not args.disable_audio_output
+        CONFIG.STATIC_IMAGE_PATH = args.image_path
+    CONFIG.USE_REAL_CAMERA = args.use_real_camera
+    CONFIG.DEBUG = args.debug
+    CONFIG.AUDIO_OUTPUT = not args.disable_audio_output
     if args.model:
-        C.model = args.model
+        CONFIG.model = args.model
 
 
 class Loader:
-    file = C.THINKING_WORDS
+    file = CONFIG.THINKING_WORDS
     with open(file) as f:
         words = f.read().strip().split(", ")
 
@@ -90,11 +90,11 @@ Special and important instructions:
 - If any tool returns an image path, always display the image to the user (even if the user did not explicitly ask for it).
 """
     agent = create_agent(
-        model=f"ollama:{C.model}",
+        model=f"ollama:{CONFIG.model}",
         tools=[camera, display_image, bounding_box_tool, *misc_tools.misc_tools],
         # middleware=[TodoListMiddleware()],
         system_prompt=SYSTEM_PROMPT,
-        debug=C.DEBUG,
+        debug=CONFIG.DEBUG,
     )
     result = agent.invoke(
         {

@@ -29,6 +29,7 @@ OUTPUT_IMAGE_DIR.mkdir(exist_ok=True)
 DEBUG = False
 USE_REAL_CAMERA = False
 AUDIO_OUTPUT = True
+MERGE_THRESHOLD = 0.3
 
 # --- Models that work with the current setup ---
 # model = "qwen3.5:4b",
@@ -54,4 +55,5 @@ CLASSIFICATION_LABELS = [
     "scary alien head",
     # other
     "not a face",
+    "body",
 ]

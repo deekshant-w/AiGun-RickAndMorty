@@ -12,7 +12,7 @@ from openwakeword.model import Model as WakeModel
 from piper import PiperVoice, SynthesisConfig
 from piper.download_voices import download_voice
 
-import rnm.config as C
+import rnm.config as CONFIG
 
 RATE = 16000  # 16kHz - default for openwakeword, webrtcvad, and whisper
 BLOCK = 1280  # 80 ms of audio, what openwakeword likes to scan a rolling window finding the wake word
@@ -173,7 +173,7 @@ def inputLoop(callback: Callable):
 class PiperTTS:
     def __init__(self, voice_name: str = "en_US-hfc_female-medium"):
         self.voice_name = voice_name
-        self.model_dir = C.TTS_MODEL_DIR
+        self.model_dir = CONFIG.TTS_MODEL_DIR
         self.model_dir.mkdir(parents=True, exist_ok=True)
         self.syn_config = SynthesisConfig(length_scale=0.9, noise_scale=1.1, noise_w_scale=1.1, volume=0.4)
 
@@ -186,7 +186,7 @@ class PiperTTS:
         self.voice = PiperVoice.load(str(model_path))
 
     def play(self, text: str):
-        if not C.AUDIO_OUTPUT:
+        if not CONFIG.AUDIO_OUTPUT:
             return
         stream = None
         for chunk in self.voice.synthesize(text, syn_config=self.syn_config):
@@ -214,11 +214,11 @@ TTS = PiperTTS()
 
 def laser(count=1, delay=0.2):
     # Play a laser sound effect `count` times.
-    if not C.AUDIO_OUTPUT:
+    if not CONFIG.AUDIO_OUTPUT:
         return
 
     def _play():
-        data = np.fromfile(C.LASER_PATH, dtype=np.int16)
+        data = np.fromfile(CONFIG.LASER_PATH, dtype=np.int16)
         with sd.OutputStream(samplerate=44100, channels=1, dtype="int16") as s:
             s.write(data)
 
