@@ -221,9 +221,8 @@ def algorithm(image_path: str) -> str:
             draw.rectangle(box, outline=color, width=3)
             draw_text(((box[0] + box[2]) / 2, box[1]), label, color=color)
 
-    output_path = CONFIG.OUTPUT_IMAGE_DIR / f"{uuid4()}.png"
+    output_path = CONFIG.OUTPUT_IMAGE_DIR / f"{uuid4()}.jpg"
     image.save(output_path)
-    image.show()
     print(f"Output image saved at: {output_path}")
     laser(len(objects))
     return f"{len(objects['alien'])} aliens shot, {len(objects['human'])} humans identified, proof:{str(output_path)}"
