@@ -13,8 +13,8 @@ Aliens get a red box and a crosshair on the forehead, humans get a green box, an
 
 | Input | After the gun |
 | --- | --- |
-| ![input 1](assets/example1-input.jpg) | ![output 1](assets/example1-output.jpg) |
-| ![input 2](assets/example2-input.jpg) | ![output 2](assets/example2-output.jpg) |
+| ![input 1](.tmp/alien.png) | ![output 1](assets/1.jpg) |
+| ![input 2](.tmp/alien2.jpg) | ![output 2](assets/2.jpg) |
 
 
 
@@ -68,7 +68,8 @@ GroundingDINO will happily return several boxes for a single face based on its t
 
 | Without Overlap removal | Overlap removed |
 | --- | --- |
-| ![input 1](assets/example1-input.jpg) | ![output 1](assets/example1-output.jpg) |
+| ![input 1](assets/3-bad.jpg) | ![output 1](assets/3.jpg) |
+| ![input 1](assets/4-bad.jpg) | ![output 1](assets/4.jpg) |
 
 Merging runs separately on each category, which guarantees that an alien box can never absorb a neighbouring human one. Two boxes are treated as the same detection when the fraction below reaches `MERGE_THRESHOLD`, at which point they are replaced by the smallest box that contains both of them:
 
