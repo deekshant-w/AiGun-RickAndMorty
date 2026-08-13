@@ -22,28 +22,27 @@ Aliens get a red box and a crosshair on the forehead, humans get a green box, an
 
 ```mermaid
 flowchart TD
-    mic["🎤 always-on mic stream"] --> wake["wake word<br/>openWakeWord"]
-    wake --> vad["record until silence<br/>webrtcvad"]
-    vad --> stt["speech to text<br/>faster-whisper"]
-    stt -->|transcript| agent{{"LangChain agent<br/>Ollama"}}
+    mic["🎤 always-on mic stream"] --> wake["wake word detection: openWakeWord"]
+    wake --> vad["record until silence \n webrtcvad"]
+    vad --> stt["speech to text \n faster-whisper"]
+    stt -->|transcript| agent{{"LangChain agent \n Ollama"}}
 
-    agent --> cam["camera<br/>static image or webcam"]
-    agent --> tool["find_aliens_and_shoot"]
-    agent --> disp["display_image<br/>PIL viewer"]
-    agent --> misc["time / date /<br/>calculator / stop"]
+    agent --> cam["camera \n static image or webcam"] --> |image path| agent
+    agent --> disp["display image"] --> agent
+    agent --> misc["time / date / \ncalculator / stop"] ---> |output| agent
 
-    cam -.->|image path| tool
+    cam -.->|image path| inner
 
-    subgraph inner["inside find_aliens_and_shoot"]
+    subgraph inner["find_aliens_and_shoot"]
         direction TB
-        dino["GroundingDINO<br/>zero-shot face boxes"] --> clip["CLIP<br/>human vs alien"]
-        clip --> merge["Overlap<br/>collapse duplicate boxes"]
-        merge --> draw["red boxes + crosshairs<br/>green boxes"]
-        draw --> out["laser SFX 🔊 + Piper narration<br/>save annotated PNG"]
+        dino["GroundingDINO \n zero-shot face boxes"] --> clip["CLIP \n human vs alien"]
+        clip --> merge["Overlapping box detection\nand collapse"]
+        merge --> draw["red/green boxes  \n and crosshairs"]
+        draw --> out["Save Image"]
     end
 
-    tool --> dino
     out -.->|saved path| disp
+    agent --> inner --> |saved path| agent
 ```
 
 1. **`inputLoop`** in `tools/audio_io.py` holds an always-on microphone stream, and openWakeWord scans a rolling window till it finds the "wake up word". A short pre-roll buffer is kept at all times so that the first syllable spoken after the wake word is never clipped off the front of the recording.
