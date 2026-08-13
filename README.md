@@ -27,9 +27,9 @@ flowchart TD
     vad --> stt["speech to text \n faster-whisper"]
     stt -->|transcript| agent{{"LangChain agent \n Ollama"}}
 
-    agent --> cam["camera \n static image or webcam"] --> |image path| agent
-    agent --> disp["display image"] --> agent
-    agent --> misc["time / date / \ncalculator / stop"] ---> |output| agent
+    agent --> cam["camera \n static image or webcam"]
+    agent --> disp["display image"]
+    agent --> misc["time / date / \ncalculator / stop"]
 
     cam -.->|image path| inner
 
@@ -42,7 +42,6 @@ flowchart TD
     end
 
     out -.->|saved path| disp
-    agent --> inner --> |saved path| agent
 ```
 
 1. **`inputLoop`** in `tools/audio_io.py` holds an always-on microphone stream, and openWakeWord scans a rolling window till it finds the "wake up word". A short pre-roll buffer is kept at all times so that the first syllable spoken after the wake word is never clipped off the front of the recording.
